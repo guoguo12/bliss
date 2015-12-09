@@ -56,4 +56,91 @@ describe("$.delegate", function() {
 			inners.forEach(click);   // should trigger callbacks
 		});
 	});
+
+	describe("$.delegate in subject-type-selectorsToCallbacks form", function() {
+		it("adds events to the children of the subject", function(done) {
+			var subject = document.createElement("div");
+			var inners = [
+				document.createElement("a"),
+				document.createElement("span"),
+				document.createElement("img"),
+			];
+			inners.forEach(function(inner) {
+				subject.appendChild(inner);
+			});
+
+			var trackerSpy = sinon.spy(function(i, target) {
+				expect(i).to.equal(trackerSpy.callCount);
+				expect(target).to.equal(subject);
+
+				if (trackerSpy.calledThrice) {
+					done();
+				}
+			});
+
+			$.delegate(subject, "click", {
+				"a": function() { trackerSpy(1, this) },
+				"span": function() { trackerSpy(2, this) },
+				"img": function() { trackerSpy(3, this) }
+			});
+			inners.forEach(click);
+		});
+
+		it("can be called on elements", function(done) {
+			var subject = document.createElement("div");
+			var inners = [
+				document.createElement("a"),
+				document.createElement("span"),
+				document.createElement("img"),
+			];
+			inners.forEach(function(inner) {
+				subject.appendChild(inner);
+			});
+
+			var trackerSpy = sinon.spy(function(i, target) {
+				expect(i).to.equal(trackerSpy.callCount);
+				expect(target).to.equal(subject);
+
+				if (trackerSpy.calledThrice) {
+					done();
+				}
+			});
+
+			subject._.delegate("click", {
+				"a": function() { trackerSpy(1, this) },
+				"span": function() { trackerSpy(2, this) },
+				"img": function() { trackerSpy(3, this) }
+			});
+			inners.forEach(click);
+		});
+
+		it("can be called on arrays", function(done) {
+			var subject = document.createElement("div");
+			var inners = [
+				document.createElement("a"),
+				document.createElement("span"),
+				document.createElement("img"),
+			];
+			inners.forEach(function(inner) {
+				subject.appendChild(inner);
+			});
+
+			var trackerSpy = sinon.spy(function(i, target) {
+				expect(i).to.equal(trackerSpy.callCount);
+				expect(target).to.equal(subject);
+
+				if (trackerSpy.calledThrice) {
+					done();
+				}
+			});
+
+			// TODO: Make less trivial (multiple subjects)
+			[subject]._.delegate("click", {
+				"a": function() { trackerSpy(1, this) },
+				"span": function() { trackerSpy(2, this) },
+				"img": function() { trackerSpy(3, this) }
+			});
+			inners.forEach(click);
+		});
+	});
 });
