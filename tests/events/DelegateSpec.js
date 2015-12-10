@@ -28,7 +28,7 @@ describe("$.delegate", function() {
 			click(inner);
 		});
 
-		it("can be called on arrays", function(done) {
+		it("can be called on arrays", function() {
 			var subjects = [
 				document.createElement("div"), // div 1
 				document.createElement("div"), // div 2
@@ -46,19 +46,16 @@ describe("$.delegate", function() {
 			var callbackSpy = sinon.spy(function() {
 				var expectedSubject = subjects[callbackSpy.callCount - 1];
 				expect(this).to.equal(expectedSubject);
-
-				if (callbackSpy.calledThrice) {
-					done();
-				}
 			});
 			subjects._.delegate("click", "a", callbackSpy);
 			subjects.forEach(click); // shouldn't trigger callbacks
 			inners.forEach(click);   // should trigger callbacks
+			expect(callbackSpy.calledThrice).to.be.ok;
 		});
 	});
 
 	describe("$.delegate in subject-type-selectorsToCallbacks form", function() {
-		it("adds events to the children of the subject", function(done) {
+		it("adds events to the children of the subject", function() {
 			var subject = document.createElement("div");
 			var inners = [
 				document.createElement("a"),
@@ -69,24 +66,21 @@ describe("$.delegate", function() {
 				subject.appendChild(inner);
 			});
 
-			var trackerSpy = sinon.spy(function(i, target) {
-				expect(i).to.equal(trackerSpy.callCount);
+			var spy = sinon.spy(function(i, target) {
+				expect(i).to.equal(spy.callCount);
 				expect(target).to.equal(subject);
-
-				if (trackerSpy.calledThrice) {
-					done();
-				}
 			});
 
 			$.delegate(subject, "click", {
-				"a": function() { trackerSpy(1, this) },
-				"span": function() { trackerSpy(2, this) },
-				"img": function() { trackerSpy(3, this) }
+				"a": function() { spy(1, this) },
+				"span": function() { spy(2, this) },
+				"img": function() { spy(3, this) }
 			});
 			inners.forEach(click);
+			expect(spy.calledThrice).to.be.ok;
 		});
 
-		it("can be called on elements", function(done) {
+		it("can be called on elements", function() {
 			var subject = document.createElement("div");
 			var inners = [
 				document.createElement("a"),
@@ -97,24 +91,21 @@ describe("$.delegate", function() {
 				subject.appendChild(inner);
 			});
 
-			var trackerSpy = sinon.spy(function(i, target) {
-				expect(i).to.equal(trackerSpy.callCount);
+			var spy = sinon.spy(function(i, target) {
+				expect(i).to.equal(spy.callCount);
 				expect(target).to.equal(subject);
-
-				if (trackerSpy.calledThrice) {
-					done();
-				}
 			});
 
 			subject._.delegate("click", {
-				"a": function() { trackerSpy(1, this) },
-				"span": function() { trackerSpy(2, this) },
-				"img": function() { trackerSpy(3, this) }
+				"a": function() { spy(1, this) },
+				"span": function() { spy(2, this) },
+				"img": function() { spy(3, this) }
 			});
 			inners.forEach(click);
+			expect(spy.calledThrice).to.be.ok;
 		});
 
-		it("can be called on arrays", function(done) {
+		it("can be called on arrays", function() {
 			var subject = document.createElement("div");
 			var inners = [
 				document.createElement("a"),
@@ -125,22 +116,19 @@ describe("$.delegate", function() {
 				subject.appendChild(inner);
 			});
 
-			var trackerSpy = sinon.spy(function(i, target) {
-				expect(i).to.equal(trackerSpy.callCount);
+			var spy = sinon.spy(function(i, target) {
+				expect(i).to.equal(spy.callCount);
 				expect(target).to.equal(subject);
-
-				if (trackerSpy.calledThrice) {
-					done();
-				}
 			});
 
 			// TODO: Make less trivial (multiple subjects)
 			[subject]._.delegate("click", {
-				"a": function() { trackerSpy(1, this) },
-				"span": function() { trackerSpy(2, this) },
-				"img": function() { trackerSpy(3, this) }
+				"a": function() { spy(1, this) },
+				"span": function() { spy(2, this) },
+				"img": function() { spy(3, this) }
 			});
 			inners.forEach(click);
+			expect(spy.calledThrice).to.be.ok;
 		});
 	});
 });
