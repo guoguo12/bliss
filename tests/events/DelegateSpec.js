@@ -1,7 +1,19 @@
-function click(element) {
+function initMouseEvent(element, type) {
 	var ev = document.createEvent("MouseEvent");
-	ev.initMouseEvent("click", true, true, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
+	ev.initMouseEvent(type, true, true, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
 	return element.dispatchEvent(ev);
+}
+
+function click(element) {
+	return initMouseEvent(element, "click");
+}
+
+function mouseDown(element) {
+	return initMouseEvent(element, "mousedown");
+}
+
+function mouseUp(element) {
+	return initMouseEvent(element, "mouseup");
 }
 
 describe("$.delegate", function() {
@@ -132,7 +144,6 @@ describe("$.delegate", function() {
 		});
 	});
 
-	// TODO: Make less trivial (multiple types)
 	describe("$.delegate in subject-typesToSelectorsToCallbacks form", function() {
 		it("adds events to the children of the subject", function() {
 			var subject = document.createElement("div");
@@ -145,20 +156,32 @@ describe("$.delegate", function() {
 				subject.appendChild(inner);
 			});
 
-			var spy = sinon.spy(function(i, target) {
-				expect(i).to.equal(spy.callCount);
+			var mouseDownSpy = sinon.spy(function(i, target) {
+				expect(i).to.equal(mouseDownSpy.callCount);
+				expect(target).to.equal(subject);
+			});
+			var mouseUpSpy = sinon.spy(function(i, target) {
+				expect(i).to.equal(mouseUpSpy.callCount);
 				expect(target).to.equal(subject);
 			});
 
 			$.delegate(subject, {
-				"click": {
-					"a": function() { spy(1, this) },
-					"span": function() { spy(2, this) },
-					"img": function() { spy(3, this) }
+				"mousedown": {
+					"a": function() { mouseDownSpy(1, this) },
+					"span": function() { mouseDownSpy(2, this) },
+					"img": function() { mouseDownSpy(3, this) }
+				},
+				"mouseup": {
+					"a": function() { mouseUpSpy(1, this) },
+					"span": function() { mouseUpSpy(2, this) },
+					"img": function() { mouseUpSpy(3, this) }
 				}
 			});
-			inners.forEach(click);
-			expect(spy.calledThrice).to.be.ok;
+
+			inners.forEach(mouseDown);
+			expect(mouseDownSpy.calledThrice).to.be.ok;
+			inners.forEach(mouseUp);
+			expect(mouseUpSpy.calledThrice).to.be.ok;
 		});
 	});
 });
