@@ -131,4 +131,34 @@ describe("$.delegate", function() {
 			expect(spy.calledThrice).to.be.ok;
 		});
 	});
+
+	// TODO: Make less trivial (multiple types)
+	describe("$.delegate in subject-typesToSelectorsToCallbacks form", function() {
+		it("adds events to the children of the subject", function() {
+			var subject = document.createElement("div");
+			var inners = [
+				document.createElement("a"),
+				document.createElement("span"),
+				document.createElement("img"),
+			];
+			inners.forEach(function(inner) {
+				subject.appendChild(inner);
+			});
+
+			var spy = sinon.spy(function(i, target) {
+				expect(i).to.equal(spy.callCount);
+				expect(target).to.equal(subject);
+			});
+
+			$.delegate(subject, {
+				"click": {
+					"a": function() { spy(1, this) },
+					"span": function() { spy(2, this) },
+					"img": function() { spy(3, this) }
+				}
+			});
+			inners.forEach(click);
+			expect(spy.calledThrice).to.be.ok;
+		});
+	});
 });
